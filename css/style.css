@@ -212,6 +212,43 @@ button:focus-visible {
   color: var(--text-soft);
 }
 
+.task {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.task-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-text {
+  margin: 0;
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+
+.task-date {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.task-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.task-btn {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
 @media (max-width: 767px) {
   .container {
     padding-left: 16px;
@@ -264,5 +301,13 @@ button:focus-visible {
 
   .filter-btn {
     flex: 1 1 auto;
+  }
+
+  .task {
+    flex-wrap: wrap;
+  }
+
+  .task-actions {
+    flex-basis: 100%;
   }
 }

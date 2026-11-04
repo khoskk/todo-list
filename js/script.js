@@ -109,3 +109,78 @@ const main = createEl('main', 'container');
 main.append(addSection, listSection);
 
 document.body.append(header, main);
+
+let tasks = [];
+
+function formatDate(date) {
+  if (date === '') {
+    return 'без срока';
+  }
+  return date.split('-').reverse().join('.');
+}
+
+function getTaskId(element) {
+  return Number(element.closest('.task').dataset.id);
+}
+
+function createTaskItem(task) {
+  const text = createEl('p', 'task-text', task.text);
+
+  const date = createEl('time', 'task-date', formatDate(task.date));
+  if (task.date !== '') {
+    date.dateTime = task.date;
+  }
+
+  const body = createEl('div', 'task-body');
+  body.append(text, date);
+
+  const deleteButton = createButton('btn btn-outline task-btn', 'Удалить');
+  deleteButton.dataset.action = 'delete';
+
+  const actions = createEl('div', 'task-actions');
+  actions.append(deleteButton);
+
+  const li = createEl('li', 'task');
+  li.dataset.id = task.id;
+  li.append(body, actions);
+  return li;
+}
+
+function renderTasks() {
+  taskList.textContent = '';
+
+  tasks.forEach((task) => {
+    taskList.append(createTaskItem(task));
+  });
+
+  emptyMessage.hidden = tasks.length > 0;
+}
+
+addForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const text = taskInput.value.trim();
+  if (text === '') {
+    taskInput.value = '';
+    taskInput.reportValidity();
+    return;
+  }
+  tasks.push({ id: Date.now(), text: text, date: dateInput.value, done: false });
+  addForm.reset();
+  taskInput.focus();
+  renderTasks();
+});
+
+taskList.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-action]');
+  if (!button) {
+    return;
+  }
+  const id = getTaskId(button);
+
+  if (button.dataset.action === 'delete') {
+    tasks = tasks.filter((task) => task.id !== id);
+  }
+  renderTasks();
+});
+
+renderTasks();
