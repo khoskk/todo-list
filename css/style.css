@@ -1,0 +1,31 @@
+:root {
+  --bg: #ffffff;
+  --text: #1f1b16;
+  --text-soft: #5a5146;
+  --accent: #8c2f25;
+  --rule: #d2c8b6;
+  --border: #857a69;
+  --serif: Georgia, "Times New Roman", serif;
+  --sans: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+  background-color: var(--bg);
+}
+
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
