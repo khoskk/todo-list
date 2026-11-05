@@ -111,6 +111,7 @@ main.append(addSection, listSection);
 document.body.append(header, main);
 
 let tasks = [];
+let editId = null;
 
 function formatDate(date) {
   if (date === '') {
@@ -123,7 +124,16 @@ function getTaskId(element) {
   return Number(element.closest('.task').dataset.id);
 }
 
+function findTask(id) {
+  return tasks.find((task) => task.id === id);
+}
+
 function createTaskItem(task) {
+  const check = createEl('input', 'task-check');
+  check.type = 'checkbox';
+  check.title = 'Выполнено';
+  check.checked = task.done;
+
   const text = createEl('p', 'task-text', task.text);
 
   const date = createEl('time', 'task-date', formatDate(task.date));
@@ -134,15 +144,46 @@ function createTaskItem(task) {
   const body = createEl('div', 'task-body');
   body.append(text, date);
 
+  const editButton = createButton('btn btn-outline task-btn', 'Изменить');
+  editButton.dataset.action = 'edit';
+
   const deleteButton = createButton('btn btn-outline task-btn', 'Удалить');
   deleteButton.dataset.action = 'delete';
 
   const actions = createEl('div', 'task-actions');
-  actions.append(deleteButton);
+  actions.append(editButton, deleteButton);
 
   const li = createEl('li', 'task');
+  if (task.done) {
+    li.classList.add('done');
+  }
   li.dataset.id = task.id;
-  li.append(body, actions);
+  li.append(check, body, actions);
+  return li;
+}
+
+function createEditItem(task) {
+  const editText = createEl('input', 'field-input edit-text');
+  editText.type = 'text';
+  editText.value = task.text;
+  editText.required = true;
+
+  const editDate = createEl('input', 'field-input edit-date');
+  editDate.type = 'date';
+  editDate.value = task.date;
+
+  const saveButton = createEl('button', 'btn btn-primary task-btn', 'Сохранить');
+  saveButton.type = 'submit';
+
+  const cancelButton = createButton('btn btn-outline task-btn', 'Отмена');
+  cancelButton.dataset.action = 'cancel';
+
+  const form = createEl('form', 'edit-form');
+  form.append(editText, editDate, saveButton, cancelButton);
+
+  const li = createEl('li', 'task editing');
+  li.dataset.id = task.id;
+  li.append(form);
   return li;
 }
 
@@ -150,7 +191,11 @@ function renderTasks() {
   taskList.textContent = '';
 
   tasks.forEach((task) => {
-    taskList.append(createTaskItem(task));
+    if (task.id === editId) {
+      taskList.append(createEditItem(task));
+    } else {
+      taskList.append(createTaskItem(task));
+    }
   });
 
   emptyMessage.hidden = tasks.length > 0;
@@ -176,10 +221,52 @@ taskList.addEventListener('click', (event) => {
     return;
   }
   const id = getTaskId(button);
+  const action = button.dataset.action;
 
-  if (button.dataset.action === 'delete') {
+  if (action === 'delete') {
     tasks = tasks.filter((task) => task.id !== id);
+  } else if (action === 'edit') {
+    editId = id;
+  } else if (action === 'cancel') {
+    editId = null;
   }
+  renderTasks();
+
+  if (action === 'edit') {
+    taskList.querySelector('.edit-text').focus();
+  }
+});
+
+taskList.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const form = event.target;
+  const textField = form.querySelector('.edit-text');
+  const text = textField.value.trim();
+  if (text === '') {
+    textField.value = '';
+    textField.reportValidity();
+    return;
+  }
+  const task = findTask(getTaskId(form));
+  task.text = text;
+  task.date = form.querySelector('.edit-date').value;
+  editId = null;
+  renderTasks();
+});
+
+taskList.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && event.target.closest('.edit-form')) {
+    editId = null;
+    renderTasks();
+  }
+});
+
+taskList.addEventListener('change', (event) => {
+  const checkbox = event.target.closest('.task-check');
+  if (!checkbox) {
+    return;
+  }
+  findTask(getTaskId(checkbox)).done = checkbox.checked;
   renderTasks();
 });
 

@@ -220,6 +220,14 @@ button:focus-visible {
   border-bottom: 1px solid var(--rule);
 }
 
+.task-check {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
 .task-body {
   flex: 1;
   min-width: 0;
@@ -247,6 +255,36 @@ button:focus-visible {
 .task-btn {
   padding: 6px 12px;
   font-size: 14px;
+}
+
+.task.done .task-text {
+  text-decoration: line-through;
+  color: var(--text-soft);
+}
+
+.task.done .task-date {
+  opacity: 0.7;
+}
+
+.edit-form {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.edit-text {
+  flex: 1 1 200px;
+  width: auto;
+  min-width: 0;
+}
+
+.edit-date {
+  flex: 0 1 160px;
+  width: auto;
+  min-width: 0;
 }
 
 @media (max-width: 767px) {
@@ -308,6 +346,11 @@ button:focus-visible {
   }
 
   .task-actions {
+    flex-basis: 100%;
+  }
+
+  .edit-text,
+  .edit-date {
     flex-basis: 100%;
   }
 }
