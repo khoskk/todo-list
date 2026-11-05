@@ -116,6 +116,7 @@ let tasks = loadTasks();
 let editId = null;
 let currentFilter = 'all';
 let searchText = '';
+let draggedItem = null;
 
 function loadTasks() {
   try {
@@ -177,6 +178,7 @@ function createTaskItem(task) {
   actions.append(editButton, deleteButton);
 
   const li = createEl('li', 'task');
+  li.draggable = true;
   if (task.done) {
     li.classList.add('done');
   }
@@ -351,6 +353,60 @@ sortGroup.addEventListener('click', (event) => {
     return;
   }
   sortTasks(button.dataset.sort);
+  saveTasks();
+  renderTasks();
+});
+
+taskList.addEventListener('dragstart', (event) => {
+  const item = event.target;
+  if (!item.draggable) {
+    return;
+  }
+  draggedItem = item;
+  item.classList.add('dragging');
+  event.dataTransfer.effectAllowed = 'move';
+  event.dataTransfer.setData('text/plain', item.dataset.id);
+});
+
+taskList.addEventListener('dragover', (event) => {
+  if (!draggedItem) {
+    return;
+  }
+  event.preventDefault();
+  const target = event.target.closest('.task');
+  if (!target || target === draggedItem) {
+    return;
+  }
+  const rect = target.getBoundingClientRect();
+  if (event.clientY < rect.top + rect.height / 2) {
+    taskList.insertBefore(draggedItem, target);
+  } else {
+    taskList.insertBefore(draggedItem, target.nextElementSibling);
+  }
+});
+
+taskList.addEventListener('drop', (event) => {
+  event.preventDefault();
+});
+
+taskList.addEventListener('dragend', () => {
+  if (!draggedItem) {
+    return;
+  }
+  draggedItem.classList.remove('dragging');
+  draggedItem = null;
+
+  const orderedTasks = [];
+  taskList.querySelectorAll('.task').forEach((item) => {
+    orderedTasks.push(findTask(getTaskId(item)));
+  });
+  let position = 0;
+  for (let i = 0; i < tasks.length; i++) {
+    if (orderedTasks.includes(tasks[i])) {
+      tasks[i] = orderedTasks[position];
+      position++;
+    }
+  }
   saveTasks();
   renderTasks();
 });
