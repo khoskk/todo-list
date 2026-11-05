@@ -80,8 +80,6 @@ button:focus-visible {
 
 .header-inner {
   padding-top: 28px;
-  padding-bottom: 16px;
-  border-bottom: 3px double var(--text);
 }
 
 .site-title {
@@ -92,6 +90,8 @@ button:focus-visible {
 
 .lead {
   margin: 0;
+  padding-bottom: 16px;
+  border-bottom: 3px double var(--text);
   font-size: 16px;
   color: var(--text-soft);
 }
@@ -304,6 +304,9 @@ button:focus-visible {
 
   .header-inner {
     padding-top: 20px;
+  }
+
+  .lead {
     padding-bottom: 12px;
   }
 
@@ -350,12 +353,25 @@ button:focus-visible {
     flex: 1 1 auto;
   }
 
+  .sort-group {
+    width: 100%;
+  }
+
+  .sort-label {
+    flex-basis: 100%;
+  }
+
+  .sort-btn {
+    flex: 1 1 auto;
+  }
+
   .task {
     flex-wrap: wrap;
   }
 
   .task-actions {
     flex-basis: 100%;
+    padding-left: 30px;
   }
 
   .edit-text,

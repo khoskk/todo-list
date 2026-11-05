@@ -138,9 +138,6 @@ function saveTasks() {
 }
 
 function formatDate(date) {
-  if (date === '') {
-    return 'без срока';
-  }
   return date.split('-').reverse().join('.');
 }
 
@@ -160,8 +157,11 @@ function createTaskItem(task) {
 
   const text = createEl('p', 'task-text', task.text);
 
-  const date = createEl('time', 'task-date', formatDate(task.date));
-  if (task.date !== '') {
+  let date;
+  if (task.date === '') {
+    date = createEl('span', 'task-date', 'без срока');
+  } else {
+    date = createEl('time', 'task-date', formatDate(task.date));
     date.dateTime = task.date;
   }
 
