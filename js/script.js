@@ -78,7 +78,7 @@ addSection.append(createEl('h2', 'section-title', 'Новая задача'), ad
 
 const searchInput = createEl('input', 'field-input search-input');
 searchInput.type = 'search';
-searchInput.placeholder = 'Поиск по названию';
+searchInput.placeholder = 'Поиск по названию или дате';
 
 const filterGroup = createEl('div', 'filter-group');
 filters.forEach((filter) => {
@@ -234,7 +234,7 @@ function getVisibleTasks() {
     if (currentFilter === 'done' && !task.done) {
       return false;
     }
-    return task.text.toLowerCase().includes(searchText);
+    return task.text.toLowerCase().includes(searchText) || formatDate(task.date).includes(searchText);
   });
 }
 
