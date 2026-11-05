@@ -114,6 +114,8 @@ const storageKey = 'todo-tasks';
 
 let tasks = loadTasks();
 let editId = null;
+let currentFilter = 'all';
+let searchText = '';
 
 function loadTasks() {
   try {
@@ -208,10 +210,37 @@ function createEditItem(task) {
   return li;
 }
 
+function sortTasks(direction) {
+  const withDate = tasks.filter((task) => task.date !== '');
+  const withoutDate = tasks.filter((task) => task.date === '');
+
+  withDate.sort((a, b) => {
+    if (direction === 'asc') {
+      return a.date.localeCompare(b.date);
+    }
+    return b.date.localeCompare(a.date);
+  });
+
+  tasks = withDate.concat(withoutDate);
+}
+
+function getVisibleTasks() {
+  return tasks.filter((task) => {
+    if (currentFilter === 'active' && task.done) {
+      return false;
+    }
+    if (currentFilter === 'done' && !task.done) {
+      return false;
+    }
+    return task.text.toLowerCase().includes(searchText);
+  });
+}
+
 function renderTasks() {
+  const visibleTasks = getVisibleTasks();
   taskList.textContent = '';
 
-  tasks.forEach((task) => {
+  visibleTasks.forEach((task) => {
     if (task.id === editId) {
       taskList.append(createEditItem(task));
     } else {
@@ -219,7 +248,12 @@ function renderTasks() {
     }
   });
 
-  emptyMessage.hidden = tasks.length > 0;
+  if (tasks.length === 0) {
+    emptyMessage.textContent = 'Задач пока нет';
+  } else {
+    emptyMessage.textContent = 'Ничего не найдено';
+  }
+  emptyMessage.hidden = visibleTasks.length > 0;
 }
 
 addForm.addEventListener('submit', (event) => {
@@ -291,6 +325,32 @@ taskList.addEventListener('change', (event) => {
     return;
   }
   findTask(getTaskId(checkbox)).done = checkbox.checked;
+  saveTasks();
+  renderTasks();
+});
+
+filterGroup.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-filter]');
+  if (!button) {
+    return;
+  }
+  currentFilter = button.dataset.filter;
+  filterGroup.querySelector('.active').classList.remove('active');
+  button.classList.add('active');
+  renderTasks();
+});
+
+searchInput.addEventListener('input', () => {
+  searchText = searchInput.value.trim().toLowerCase();
+  renderTasks();
+});
+
+sortGroup.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-sort]');
+  if (!button) {
+    return;
+  }
+  sortTasks(button.dataset.sort);
   saveTasks();
   renderTasks();
 });
