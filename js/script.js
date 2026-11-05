@@ -110,8 +110,29 @@ main.append(addSection, listSection);
 
 document.body.append(header, main);
 
-let tasks = [];
+const storageKey = 'todo-tasks';
+
+let tasks = loadTasks();
 let editId = null;
+
+function loadTasks() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey));
+    if (!Array.isArray(saved)) {
+      return [];
+    }
+    return saved.filter((task) => {
+      return typeof task.id === 'number' && typeof task.text === 'string' &&
+        typeof task.date === 'string' && typeof task.done === 'boolean';
+    });
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveTasks() {
+  localStorage.setItem(storageKey, JSON.stringify(tasks));
+}
 
 function formatDate(date) {
   if (date === '') {
@@ -212,6 +233,7 @@ addForm.addEventListener('submit', (event) => {
   tasks.push({ id: Date.now(), text: text, date: dateInput.value, done: false });
   addForm.reset();
   taskInput.focus();
+  saveTasks();
   renderTasks();
 });
 
@@ -225,6 +247,7 @@ taskList.addEventListener('click', (event) => {
 
   if (action === 'delete') {
     tasks = tasks.filter((task) => task.id !== id);
+    saveTasks();
   } else if (action === 'edit') {
     editId = id;
   } else if (action === 'cancel') {
@@ -251,6 +274,7 @@ taskList.addEventListener('submit', (event) => {
   task.text = text;
   task.date = form.querySelector('.edit-date').value;
   editId = null;
+  saveTasks();
   renderTasks();
 });
 
@@ -267,6 +291,7 @@ taskList.addEventListener('change', (event) => {
     return;
   }
   findTask(getTaskId(checkbox)).done = checkbox.checked;
+  saveTasks();
   renderTasks();
 });
 
